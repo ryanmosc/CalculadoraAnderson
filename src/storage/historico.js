@@ -10,3 +10,8 @@ export async function carregar() {
   const texto = await AsyncStorage.getItem(CHAVE);
   return texto ? JSON.parse(texto) : [];
 }
+
+
+export async function limpar() {
+  await AsyncStorage.removeItem(CHAVE);
+}

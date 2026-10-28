@@ -11,17 +11,31 @@ import {
 } from '../utils/calcular';
 import { carregar, salvar } from '../storage/historico';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const [expressao, setExpressao] = useState('');
   const [resultado, setResultado] = useState('');
   const [calculado, setCalculado] = useState(false); // acabou de apertar =
   const [memoria, setMemoria] = useState(0);
   const [historico, setHistorico] = useState([]);
 
-  // carrega o histórico salvo, uma vez, quando a tela abre
+  // Evolução 1: carrega o histórico ao abrir E toda vez que a Home ganha foco
   useEffect(() => {
-    carregar().then(setHistorico);
-  }, []);
+    carregar().then(setHistorico); // carga inicial
+    const cancelar = navigation.addListener('focus', () => {
+      carregar().then(setHistorico);
+    });
+    return cancelar;
+  }, [navigation]);
+
+  // Evolução 3: recebe o valor vindo do histórico.
+  // Observa o "ts" (muda a cada toque), assim funciona mesmo com o mesmo valor.
+  useEffect(() => {
+    if (route.params?.valor) {
+      setExpressao(route.params.valor);
+      setResultado('');
+      setCalculado(false);
+    }
+  }, [route.params?.ts]);
 
   function limpar() {
     setExpressao('');
